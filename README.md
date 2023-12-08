@@ -10,7 +10,7 @@
 docker-compose up -d
 ```
 
-# Poetry
+## Poetry
 Запускаем бота
 ```bash
 poetry install
