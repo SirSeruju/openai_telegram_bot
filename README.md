@@ -14,5 +14,6 @@ docker-compose up -d
 ```
 Запускаем бота
 ```bash
+cd src
 poetry run python bot.py
 ```
