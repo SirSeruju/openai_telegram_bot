@@ -5,6 +5,7 @@ import datetime
 from sqlalchemy import select, desc
 from sqlalchemy.dialects.postgresql import insert
 
+from pytz import timezone
 from typing import Optional
 from pydantic import BaseModel
 
@@ -25,14 +26,14 @@ class ChatMessage(BaseModel):
     openai_response_delay_ms: int
 
 
-def get_context(session: Session, user: User, limit=100):
+async def get_context(session: Session, user: User, limit=100):
     """
     Получает данные о контексте из БД с ограничением на количество :limit:
     """
     query = select(ChatMessages).where(
         ChatMessages.user_id == user.telegram_id
     ).order_by(desc(ChatMessages.id)).limit(limit)
-    messages = session.execute(query).all()
+    messages = (await session.execute(query)).all()
     context = []
     for message in messages:
         message = message[0]
@@ -43,7 +44,7 @@ def get_context(session: Session, user: User, limit=100):
     return context
 
 
-def update_context(session: Session, user: User, message: ChatMessage):
+async def update_context(session: Session, user: User, message: ChatMessage):
     """
     Добавляет данные в контекст и вставляет/обновляет данные о пользователе
     """
@@ -54,20 +55,23 @@ def update_context(session: Session, user: User, message: ChatMessage):
         username=user.username,
         first_name=user.first_name,
         last_name=user.last_name,
-        registation_date=user.registation_date,
+        registation_date=user.registation_date.astimezone(
+            timezone("UTC")).replace(tzinfo=None),
     ).on_conflict_do_update(
         index_elements=["telegram_id"],
         set_=on_update_set
     )
-    session.execute(query)
+    await session.execute(query)
 
     query = insert(ChatMessages).values(
         user_id=user.telegram_id,
         user_message=message.user_message,
-        user_message_datetime=message.user_message_datetime,
+        user_message_datetime=message.user_message_datetime.astimezone(
+            timezone("UTC")).replace(tzinfo=None),
         openai_message=message.openai_message,
-        openai_message_datetime=message.openai_message_datetime,
+        openai_message_datetime=message.openai_message_datetime.astimezone(
+            timezone("UTC")).replace(tzinfo=None),
         openai_response_delay_ms=message.openai_response_delay_ms,
     )
-    session.execute(query)
-    session.commit()
+    await session.execute(query)
+    await session.commit()

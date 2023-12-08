@@ -2,7 +2,7 @@ from sqlalchemy import (
     Column, ForeignKey, String, BigInteger, DateTime, Integer
 )
 
-from database.connection import Base, engine
+from database.connection import Base
 
 
 class Users(Base):
@@ -26,6 +26,3 @@ class ChatMessages(Base):
     openai_message = Column(String, nullable=True)
     openai_message_datetime = Column(DateTime, nullable=True)
     openai_response_delay_ms = Column(Integer, nullable=True)
-
-
-Base.metadata.create_all(engine)

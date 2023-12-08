@@ -54,8 +54,8 @@ async def message_handler(message: types.Message) -> None:
         registation_date=datetime.datetime.now(),
     )
     logger.info(f"Message from {user}")
-    with Session() as session:
-        context = get_context(session, user)
+    async with Session() as session:
+        context = await get_context(session, user)
     context.append({"role": "user", "content": message.text})
 
     # TODO: log it
@@ -79,8 +79,8 @@ async def message_handler(message: types.Message) -> None:
         openai_message_datetime=responce_message.date,
         openai_response_delay_ms=response_delay,
     )
-    with Session() as session:
-        update_context(session, user, context_upd)
+    async with Session() as session:
+        await update_context(session, user, context_upd)
 
 
 async def main() -> None:
