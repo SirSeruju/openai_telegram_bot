@@ -1,7 +1,8 @@
-from sqlalchemy import Column, ForeignKey, String, BigInteger, DateTime, Integer
+from sqlalchemy import (
+    Column, ForeignKey, String, BigInteger, DateTime, Integer
+)
 
 from database.connection import Base, engine
-import asyncio
 
 
 class Users(Base):
@@ -9,8 +10,8 @@ class Users(Base):
 
     telegram_id = Column(BigInteger, primary_key=True, index=True)
     username = Column(String, nullable=True)
-    first_name = Column(String, nullable=True)
-    last_name = Column(String, nullable=True)
+    first_name = Column(String)
+    last_name = Column(String)
     registation_date = Column(DateTime, nullable=True)
 
 
@@ -24,7 +25,7 @@ class ChatMessages(Base):
     user_message_datetime = Column(DateTime, nullable=True)
     openai_message = Column(String, nullable=True)
     openai_message_datetime = Column(DateTime, nullable=True)
-    openai_response_duration_ms = Column(Integer, nullable=True)
+    openai_response_delay_ms = Column(Integer, nullable=True)
 
 
 Base.metadata.create_all(engine)
