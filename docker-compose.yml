@@ -2,7 +2,6 @@ version: "3.9"
 
 services:
 
-  # TODO: Add healthcheck
   postgres:
     image: postgres:16
     ports:
@@ -11,9 +10,16 @@ services:
       - ./data:/var/lib/postgresql/data
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
 
-  # TODO: Add depends_on
   openai_telegram_bot:
     build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
     env_file:
       - .env
