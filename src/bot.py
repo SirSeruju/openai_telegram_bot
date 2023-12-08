@@ -8,22 +8,22 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from database.connection import Session
 from context import User, ChatMessage, get_context, update_context
 from config import TELEGRAM_TOKEN, OPENAI_API_KEY
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
-def extract_additional_tokens(text):
+async def extract_additional_tokens(text):
     prompt = """
         If the user indicated something similar to a date in the message,
         then output it in JSON format, store it into "date_user" field,
         otherwise output empty JSON
     """
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": prompt},
@@ -59,12 +59,12 @@ async def message_handler(message: types.Message) -> None:
     context.append({"role": "user", "content": message.text})
 
     # TODO: log it
-    tokens = extract_additional_tokens(message.text)
+    tokens = await extract_additional_tokens(message.text)
     print(f"Additional tokens: {tokens}")
 
     # TODO: Как-то получать задержку напрямую
     start_response_timestamp = datetime.datetime.now().timestamp()
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=context
     )
