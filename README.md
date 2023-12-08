@@ -4,13 +4,14 @@
 
 # Как запустить
 Сначала редактируем .env файл
-## Docker-compose
+
+## С помощью Docker-compose
 Запускаем Postgres(создаст папку data, куда будет сохранять данные) и бота в docker'е
 ```bash
 docker-compose up -d
 ```
 
-## Poetry
+## С помощью Poetry
 Запускаем бота
 ```bash
 poetry install
