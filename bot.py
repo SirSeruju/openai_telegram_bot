@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from os import getenv
 from loguru import logger
 
 from aiogram import Bot, Dispatcher, types
@@ -13,9 +12,9 @@ from openai import OpenAI
 
 from database.connection import Session
 from context import User, ChatMessage, get_context, update_context
+from config import TELEGRAM_TOKEN, OPENAI_API_KEY
 
-client = OpenAI(api_key=getenv("OPENAI_API_KEY").strip())
-TOKEN = getenv("TELEGRAM_TOKEN").strip()
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def extract_additional_tokens(text):
@@ -85,7 +84,8 @@ async def message_handler(message: types.Message) -> None:
 
 
 async def main() -> None:
-    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    logger.info("Bot started")
+    bot = Bot(TELEGRAM_TOKEN, parse_mode=ParseMode.HTML)
     await dp.start_polling(bot)
 
 
