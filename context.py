@@ -26,6 +26,9 @@ class ChatMessage(BaseModel):
 
 
 def get_context(session: Session, user: User, limit=100):
+    """
+    Получает данные о контексте из БД с ограничением на количество :limit:
+    """
     query = select(ChatMessages).where(
         ChatMessages.user_id == user.telegram_id
     ).order_by(desc(ChatMessages.id)).limit(limit)
@@ -41,6 +44,9 @@ def get_context(session: Session, user: User, limit=100):
 
 
 def update_context(session: Session, user: User, message: ChatMessage):
+    """
+    Добавляет данные в контекст и вставляет/обновляет данные о пользователе
+    """
     on_update_set = dict(user)
     on_update_set.pop("registation_date")
     query = insert(Users).values(
