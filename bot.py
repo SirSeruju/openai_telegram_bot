@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from os import getenv
+from loguru import logger
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
@@ -21,6 +22,7 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
+    logger.info(f"Start conversation with {message.from_user.id}")
     await message.answer(
         f"Hello, {hbold(message.from_user.full_name)}! Now we can talk!"
     )
@@ -35,6 +37,7 @@ async def message_handler(message: types.Message) -> None:
         last_name=message.from_user.last_name,
         registation_date=datetime.datetime.now(),
     )
+    logger.info(f"Message from {user}")
     with Session() as session:
         context = get_context(session, user)
     context.append({"role": "user", "content": message.text})
