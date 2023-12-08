@@ -17,6 +17,23 @@ from context import User, ChatMessage, get_context, update_context
 client = OpenAI(api_key=getenv("OPENAI_API_KEY").strip())
 TOKEN = getenv("TELEGRAM_TOKEN").strip()
 
+
+def extract_additional_tokens(text):
+    prompt = """
+        If the user indicated something similar to a date in the message,
+        then output it in JSON format, store it into "date_user" field,
+        otherwise output empty JSON
+    """
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": text}
+        ]
+    )
+    return response.choices[0].message.content
+
+
 dp = Dispatcher()
 
 
@@ -41,6 +58,10 @@ async def message_handler(message: types.Message) -> None:
     with Session() as session:
         context = get_context(session, user)
     context.append({"role": "user", "content": message.text})
+
+    # TODO: log it
+    tokens = extract_additional_tokens(message.text)
+    print(f"Additional tokens: {tokens}")
 
     # TODO: Как-то получать задержку напрямую
     start_response_timestamp = datetime.datetime.now().timestamp()
@@ -68,5 +89,6 @@ async def main() -> None:
     await dp.start_polling(bot)
 
 
+# TODO: Use better aio loops or smt
 if __name__ == "__main__":
     asyncio.run(main())
