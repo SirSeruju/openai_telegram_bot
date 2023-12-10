@@ -31,6 +31,10 @@ docker-compose up -d bot
 poetry install
 cd src
 ```
+Ставим переменные окружения
+```bash
+export $(grep -v '^#' .env | xargs)
+```
 
 Выполняем миграции(опционально)
 ```bash
