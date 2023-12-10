@@ -26,16 +26,18 @@ docker-compose up -d bot
 
 ## С помощью Poetry
 
-Устанавливаем зависимости и заходим в папку с кодом
+Устанавливаем зависимости
 ```bash
 poetry install
-cd src
 ```
 Ставим переменные окружения
 ```bash
 export $(grep -v '^#' .env | xargs)
 ```
-
+Заходим в папку с кодом
+```bash
+cd src
+```
 Выполняем миграции(опционально)
 ```bash
 poetry run alembic upgrade head
